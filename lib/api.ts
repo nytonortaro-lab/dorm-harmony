@@ -1,20 +1,19 @@
-// 网络请求工具函数
-
 interface FetchOptions extends RequestInit {
   timeout?: number;
 }
 
-interface ApiResponse<T = any> {
+interface ApiResponse<T = unknown> {
   success: boolean;
   data?: T;
   message?: string;
   error?: string;
 }
 
-/**
- * 发送 HTTP 请求
- */
-export async function apiCall<T = any>(
+type ErrorBody = {
+  message?: string;
+};
+
+export async function apiCall<T = unknown>(
   url: string,
   options: FetchOptions = {}
 ): Promise<ApiResponse<T>> {
@@ -31,7 +30,7 @@ export async function apiCall<T = any>(
 
     clearTimeout(timeoutId);
 
-    const data = await response.json();
+    const data = (await response.json()) as T & ErrorBody;
 
     if (!response.ok) {
       return {
@@ -51,25 +50,24 @@ export async function apiCall<T = any>(
       if (error.name === "AbortError") {
         return {
           success: false,
-          error: "请求超时，请检查网络连接",
+          error: "Request timed out. Please check your connection.",
         };
       }
+
       return {
         success: false,
-        error: error.message || "网络请求失败",
+        error: error.message || "Request failed",
       };
     }
+
     return {
       success: false,
-      error: "未知错误",
+      error: "Unknown error",
     };
   }
 }
 
-/**
- * GET 请求
- */
-export async function get<T = any>(
+export async function get<T = unknown>(
   url: string,
   options: FetchOptions = {}
 ): Promise<ApiResponse<T>> {
@@ -79,12 +77,9 @@ export async function get<T = any>(
   });
 }
 
-/**
- * POST 请求
- */
-export async function post<T = any>(
+export async function post<T = unknown>(
   url: string,
-  body?: any,
+  body?: unknown,
   options: FetchOptions = {}
 ): Promise<ApiResponse<T>> {
   return apiCall<T>(url, {
@@ -98,12 +93,9 @@ export async function post<T = any>(
   });
 }
 
-/**
- * PUT 请求
- */
-export async function put<T = any>(
+export async function put<T = unknown>(
   url: string,
-  body?: any,
+  body?: unknown,
   options: FetchOptions = {}
 ): Promise<ApiResponse<T>> {
   return apiCall<T>(url, {
@@ -117,10 +109,7 @@ export async function put<T = any>(
   });
 }
 
-/**
- * DELETE 请求
- */
-export async function del<T = any>(
+export async function del<T = unknown>(
   url: string,
   options: FetchOptions = {}
 ): Promise<ApiResponse<T>> {
@@ -130,9 +119,6 @@ export async function del<T = any>(
   });
 }
 
-/**
- * 检查网络连接
- */
 export async function checkConnection(): Promise<boolean> {
   try {
     const response = await fetch("/api/health", {

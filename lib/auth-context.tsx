@@ -22,17 +22,21 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  // 初始化：从 localStorage 恢复用户数据
   useEffect(() => {
-    const storedUser = localStorage.getItem("user");
-    if (storedUser) {
-      try {
-        setUser(JSON.parse(storedUser));
-      } catch (e) {
-        console.error("Failed to parse stored user:", e);
+    const timer = window.setTimeout(() => {
+      const storedUser = localStorage.getItem("user");
+      if (storedUser) {
+        try {
+          setUser(JSON.parse(storedUser));
+        } catch (error) {
+          console.error("Failed to parse stored user:", error);
+        }
       }
-    }
-    setIsLoading(false);
+
+      setIsLoading(false);
+    }, 0);
+
+    return () => window.clearTimeout(timer);
   }, []);
 
   const login = (userData: User) => {

@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import Link from "next/link";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 
 type PrototypeTab = "overview" | "discover" | "my-space" | "community";
@@ -80,7 +81,7 @@ export default function PrototypePage() {
     [selectedId]
   );
 
-  async function loadCurrentUser() {
+  const loadCurrentUser = useCallback(async () => {
     setLoadingUser(true);
 
     const {
@@ -95,9 +96,9 @@ export default function PrototypePage() {
 
     setUserEmail(user.email || "");
     setLoadingUser(false);
-  }
+  }, [supabase]);
 
-  async function loadPosts() {
+  const loadPosts = useCallback(async () => {
     const { data, error } = await supabase
       .from("community_posts")
       .select("*")
@@ -109,7 +110,7 @@ export default function PrototypePage() {
     }
 
     setPosts(data || []);
-  }
+  }, [supabase]);
 
   async function handlePublishPost(e: React.FormEvent) {
     e.preventDefault();
@@ -166,9 +167,13 @@ export default function PrototypePage() {
   }
 
   useEffect(() => {
-    loadCurrentUser();
-    loadPosts();
-  }, []);
+    const timer = window.setTimeout(() => {
+      void loadCurrentUser();
+      void loadPosts();
+    }, 0);
+
+    return () => window.clearTimeout(timer);
+  }, [loadCurrentUser, loadPosts]);
 
   return (
     <main className="min-h-screen bg-slate-100 text-slate-900">
@@ -234,12 +239,12 @@ export default function PrototypePage() {
             <div className="mt-8 rounded-3xl bg-slate-100 p-4">
               <p className="font-medium">Quick links</p>
               <div className="mt-3 space-y-2 text-sm">
-                <a href="/" className="block underline">
+                <Link href="/" className="block underline">
                   Back to current home
-                </a>
-                <a href="/community" className="block underline">
+                </Link>
+                <Link href="/community" className="block underline">
                   Open standalone community page
-                </a>
+                </Link>
               </div>
             </div>
 
@@ -374,7 +379,7 @@ export default function PrototypePage() {
               <div className="space-y-6">
                 <div className="rounded-3xl bg-white p-8 shadow-sm">
                   <h2 className="text-2xl font-semibold">
-                    {selectedProfile.name}'s Profile
+                    Profile of {selectedProfile.name}
                   </h2>
                   <div className="mt-6 space-y-4">
                     <div className="rounded-2xl bg-slate-50 p-4">

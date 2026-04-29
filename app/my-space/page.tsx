@@ -1,5 +1,7 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { serializeAppUser } from "@/lib/dorm-data";
+import { ProfileDashboard } from "@/components/profile-dashboard";
 
 export default async function MySpacePage() {
   const supabase = await createClient();
@@ -11,20 +13,5 @@ export default async function MySpacePage() {
     redirect("/login");
   }
 
-  return (
-    <main className="min-h-screen bg-slate-100 p-8">
-      <div className="mx-auto max-w-5xl rounded-3xl bg-white p-8 shadow-sm">
-        <h1 className="text-3xl font-bold text-slate-900">My Space</h1>
-        <p className="mt-3 text-slate-600">
-          This page is now a real route and is protected by login.
-        </p>
-
-        <div className="mt-6">
-          <a href="/" className="text-slate-900 underline">
-            Back to Home
-          </a>
-        </div>
-      </div>
-    </main>
-  );
+  return <ProfileDashboard user={serializeAppUser(user)} />;
 }

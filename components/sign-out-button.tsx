@@ -1,15 +1,22 @@
 "use client";
 
 import { useState } from "react";
+import { LogOut } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
+import { Button } from "@/components/ui/button";
+import { useApp } from "@/lib/app-context";
 
-export default function SignOutButton() {
+type SignOutButtonProps = {
+  className?: string;
+};
+
+export default function SignOutButton({ className }: SignOutButtonProps) {
+  const { t } = useApp();
   const [loading, setLoading] = useState(false);
 
   async function handleSignOut() {
     try {
       setLoading(true);
-
       const supabase = createClient();
       const { error } = await supabase.auth.signOut();
 
@@ -22,19 +29,20 @@ export default function SignOutButton() {
       window.location.href = "/login";
     } catch (error) {
       console.error("Sign out error:", error);
-      alert("Sign out failed.");
+      alert(t("networkError"));
       setLoading(false);
     }
   }
 
   return (
-    <button
+    <Button
       type="button"
       onClick={handleSignOut}
       disabled={loading}
-      className="rounded-2xl bg-slate-900 px-4 py-2 text-white transition hover:bg-slate-800 disabled:opacity-60"
+      className={className}
     >
-      {loading ? "Signing out..." : "Sign out"}
-    </button>
+      <LogOut className="size-4" />
+      {loading ? t("saving") : t("signOut")}
+    </Button>
   );
 }

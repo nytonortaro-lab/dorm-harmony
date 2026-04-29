@@ -1,22 +1,12 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
 import { AuthProvider } from "@/lib/auth-context";
 import { AppProvider } from "@/lib/app-context";
 import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
-
 export const metadata: Metadata = {
-  title: "Dorm Harmony - 找到理想的舍友",
-  description: "Dorm Harmony - 为您找到理想的舍友，创造和谐的宿舍生活",
+  title: "Dorm Harmony",
+  description:
+    "Dorm Harmony helps students describe their living habits, join a matching pool, and meet roommates with fewer surprises.",
 };
 
 export default function RootLayout({
@@ -27,7 +17,9 @@ export default function RootLayout({
   return (
     <html
       lang="zh-CN"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      suppressHydrationWarning
+      className="h-full antialiased"
+      data-style="harmony"
     >
       <body className="min-h-full flex flex-col">
         <AuthProvider>
